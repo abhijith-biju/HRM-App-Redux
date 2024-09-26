@@ -2,7 +2,7 @@ export interface IApiEmployee {
     id: number;
     firstName: string;
     lastName: string;
-    isActive: true;
+    isActive: boolean;
     dob: string;
     email: string;
     phone: string;
@@ -16,12 +16,14 @@ export interface IApiEmployee {
     moreDetails: string;
 }
 
+export interface IApiEmployeesData {
+    employees: IApiEmployee[];
+    count: number;
+}
+
 export interface IApiFetchEmployeesArray {
     message: string;
-    data: {
-        employees: IApiEmployee[];
-        count: number;
-    };
+    data: IApiEmployeesData;
 }
 
 export interface IApiFetchEmployee {
@@ -46,12 +48,14 @@ export interface IApiEmployeeSubmission {
     moreDetails: string;
 }
 
+export interface IApiEmployeePostRepsonse {
+    message: string;
+    data: { id: number };
+}
+
 export interface IApiFetchSkill {
     message: string;
-    data: {
-        id: number;
-        skill: string;
-    }[];
+    data: IApiSkill[];
 }
 
 export interface IApiSkill {

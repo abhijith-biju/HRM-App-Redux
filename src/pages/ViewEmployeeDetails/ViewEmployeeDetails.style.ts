@@ -12,7 +12,7 @@ const StyledEmpDetailsWrap = styled.section`
         box-shadow: 0 6px 20px -5px rgba(0, 0, 0);
         overflow: hidden;
 
-        & .main-details {
+        & .primary-employee-details {
             background-color: var(--primary-clr);
             color: #fff;
             width: 350px;
@@ -51,7 +51,7 @@ const StyledEmpDetailsWrap = styled.section`
             margin: 0 0 4px 0;
         }
 
-        & dl.extended-details {
+        & dl.secondary-employee-details {
             margin: 0;
             padding: 30px 20px;
             display: flex;

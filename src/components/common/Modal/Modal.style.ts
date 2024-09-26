@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 
-interface IModal {
-    $isOpen: boolean;
-}
-
-const Overlay = styled.div<IModal>`
+const Overlay = styled.div<{ $isOpen: boolean }>`
     position: fixed;
     display: none;
     inset: 0 0 0 0;
@@ -19,7 +15,7 @@ const Overlay = styled.div<IModal>`
     `}
 `;
 
-const StyledModal = styled.div<IModal>`
+const StyledModal = styled.div<{ $isOpen: boolean }>`
     display: none;
     position: fixed;
     max-height: 95vh;
@@ -28,12 +24,13 @@ const StyledModal = styled.div<IModal>`
     translate: -50% -50%;
     overflow: hidden auto;
     min-width: 250px;
+    max-width: 550px;
     border: 1px solid black;
     z-index: 4;
     background-color: #fff;
     border: none;
     border-radius: 5px;
-    padding: 25px 20px;
+    padding: 40px 35px 30px;
 
     ${({ $isOpen }) =>
         $isOpen &&
@@ -41,14 +38,25 @@ const StyledModal = styled.div<IModal>`
             display: block;
     `}
 
-    & .confirm-dialog-msg {
-        margin: 0;
-        margin-bottom: 20px;
+    .cancel-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0;
+        margin: 10px;
+
+        span {
+            color: red;
+        }
+
+        span:hover {
+            font-variation-settings: 'FILL' 1;
+        }
     }
 
-    & .confirm-dialog-actions {
-        gap: 10px;
-        justify-content: right;
+    .confirm-dialog-msg {
+        margin: 0;
+        margin-bottom: 20px;
     }
 `;
 

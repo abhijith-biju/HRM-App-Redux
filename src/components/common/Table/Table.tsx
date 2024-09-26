@@ -1,9 +1,11 @@
 import StyledTable from './Table.style';
 import { Loader, Button } from '../..';
 import { useSearchParams } from 'react-router-dom';
-import { initQueryParams } from '../../../pages/ManageEmployees/constants';
+import { defaultSearchParams } from '../../../pages/ManageEmployees/constants';
 import upArrow from '../../../assets/images/up-arrow.svg';
 import doubleArrow from '../../../assets/images/multi-arrow.svg';
+import { useAppDispatch } from '../../../hooks/storeHelpers';
+import { employeeListClear } from '../../../core/store/employeesList/actions';
 
 interface ITheader {
     value: string;
@@ -26,6 +28,7 @@ const Table: React.FC<ITable> = ({
     loading,
 }) => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const dispatch = useAppDispatch();
 
     const sortButtonClickHandler = (event: React.MouseEvent<HTMLElement>) => {
         const buttonElement = event.target as HTMLElement;
@@ -36,6 +39,7 @@ const Table: React.FC<ITable> = ({
             currentSortDirection === 'asc' ? 'desc' : 'asc';
 
         if (tableHeaderValue && currentSortDirection) {
+            dispatch(employeeListClear());
             buttonElement.setAttribute('data-sort-dir', nextSortDirection);
             searchParams.set('offset', '0');
             searchParams.set('sortBy', tableHeaderValue);
@@ -50,13 +54,13 @@ const Table: React.FC<ITable> = ({
         if (currentSortBy === headerValue) {
             return searchParams.get('sortDir') || 'desc';
         }
-        return initQueryParams.sortDir;
+        return defaultSearchParams.sortDir;
     };
 
     const isSortActiveColumn = (headerValue: string) => {
         const currentSortBy = searchParams.get('sortBy');
 
-        if (!currentSortBy && headerValue === initQueryParams.sortBy) {
+        if (!currentSortBy && headerValue === defaultSearchParams.sortBy) {
             return 'true';
         }
         if (currentSortBy === headerValue) {

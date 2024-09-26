@@ -14,6 +14,7 @@ import Pagination from './common/Pagination/Pagination.tsx';
 import LinkButton from './common/LinkButton/LinkButton.tsx';
 import EmployeeDetailsForm from './EmployeeDetailsForm/EmployeeDetailsForm.tsx';
 import EmployeesTableFilter from './EmployeesTableFilter/EmployeesTableFilter.tsx';
+import EmployeeDeleteModal from './EmployeeDeleteModal/EmployeeDeleteModal.tsx';
 
 export {
     Header,
@@ -32,4 +33,5 @@ export {
     LinkButton,
     EmployeeDetailsForm,
     EmployeesTableFilter,
+    EmployeeDeleteModal,
 };

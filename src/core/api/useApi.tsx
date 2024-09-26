@@ -1,10 +1,6 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
-
-export const API = axios.create({
-    baseURL: 'https://vipinms.cloud/',
-    timeout: 10000,
-});
+import { API } from '.';
 
 const useApi = <T,>(
     method: string,

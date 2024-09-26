@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '../../hooks/storeHelpers';
 import { Formik } from 'formik';
 import {
     Button,
@@ -16,34 +17,44 @@ import {
     prefillDataOnEmployeeAdd,
 } from '../../pages/ManageEmployees/constants';
 import validate from './validation';
-import { useAppContext } from '../../core/contexts/AppContext';
 import { IEmployee } from '../../interfaces/common';
 import handleFormSubmit from './handleFormSubmit';
 import { sortObjByKey } from '../../utils';
 import profilePictureAvatar from '../../assets/images/add-profile-photo.svg';
 
 interface IEmployeeDetailsForm {
-    empId?: string | null;
     prefillData?: IEmployee;
 }
 
 const EmployeeDetailsForm: React.FC<IEmployeeDetailsForm> = ({
-    empId = null,
     prefillData = {
         ...prefillDataOnEmployeeAdd,
     },
 }) => {
-    const { appState } = useAppContext();
-    const [loading, setLoading] = useState(false);
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
+    const selectSkills = useAppSelector(
+        (state) => state.dropdownData.skills.skillsData
+    );
+    const selectDepartments = useAppSelector(
+        (state) => state.dropdownData.departments.departmentsData
+    );
+    const selectRoles = useAppSelector(
+        (state) => state.dropdownData.roles.rolesData
+    );
+
+    const [loading, setLoading] = useState(false);
+
     const [photoId, setPhotoId] = useState(prefillData.photoId);
+    const [isPhotoInputDirty, setIsPhotoInputDirty] = useState<boolean>(false);
     const photoRef = useRef<HTMLInputElement>(null);
 
     const photoUploadHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const imgFile = e.target.files[0];
             setPhotoId(URL.createObjectURL(imgFile));
+            setIsPhotoInputDirty(true);
         }
     };
 
@@ -63,16 +74,19 @@ const EmployeeDetailsForm: React.FC<IEmployeeDetailsForm> = ({
                 <StyledFormWrap>
                     <Formik
                         initialValues={prefillData}
+                        enableReinitialize
                         validationSchema={validate}
-                        onSubmit={async (values) => {
+                        onSubmit={async (values, { setSubmitting }) => {
                             setLoading(true);
-                            await handleFormSubmit(
+
+                            const id: number = await handleFormSubmit(
                                 values,
-                                empId,
-                                photoRef.current
+                                photoRef.current,
+                                dispatch
                             );
-                            navigate(`/`);
+                            setSubmitting(false);
                             setLoading(false);
+                            navigate(`/view-employee/${id}`, { replace: true });
                         }}
                     >
                         {(props) => {
@@ -166,7 +180,7 @@ const EmployeeDetailsForm: React.FC<IEmployeeDetailsForm> = ({
                                             <CustomSelect
                                                 name="role"
                                                 label="Role"
-                                                options={appState.roles}
+                                                options={selectRoles}
                                                 placeholder="Select a Role"
                                                 required
                                             />
@@ -175,7 +189,7 @@ const EmployeeDetailsForm: React.FC<IEmployeeDetailsForm> = ({
                                             <CustomSelect
                                                 name="department"
                                                 label="Department"
-                                                options={appState.departments}
+                                                options={selectDepartments}
                                                 placeholder="Select a Department"
                                                 required
                                             />
@@ -208,7 +222,7 @@ const EmployeeDetailsForm: React.FC<IEmployeeDetailsForm> = ({
                                             <CustomSelect
                                                 name="skills"
                                                 label="Skills"
-                                                options={appState.skills}
+                                                options={selectSkills}
                                                 placeholder="Select one or more skills"
                                                 isMulti
                                                 closeMenuOnSelect={false}
@@ -226,7 +240,13 @@ const EmployeeDetailsForm: React.FC<IEmployeeDetailsForm> = ({
                                         <Button
                                             className="primary"
                                             type="submit"
-                                            disabled={props.isSubmitting}
+                                            disabled={
+                                                props.isSubmitting ||
+                                                !(
+                                                    props.dirty ||
+                                                    isPhotoInputDirty
+                                                )
+                                            }
                                         >
                                             SUBMIT
                                         </Button>

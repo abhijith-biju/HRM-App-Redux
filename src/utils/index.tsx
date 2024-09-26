@@ -2,11 +2,16 @@ import {
     IEmployeeListing,
     IEmployee,
     IReactSelectOption,
-    IDeleteEmployee,
 } from '../interfaces/common';
 import { IApiEmployee } from '../interfaces/ApiDataInterface';
 import { Button, LinkButton } from '../components';
 import { locations } from '../pages/ManageEmployees/constants';
+
+export const fillEmptySlotsWithValue = (arr: any[], value: any) =>
+    Array.from(arr, (_, i) => {
+        if (!(i in arr)) return value;
+        else return arr[i];
+    });
 
 //sort array object by sortKey (slice() to create a new array)
 export const sortObjByKey = (srcObjArray: any[], sortKey: string) => {
@@ -36,7 +41,7 @@ export const modifySelectOption = (optionObj: any, curLabelKey: string) => {
 
 //modify each option object in options array to {value: string, label: string}
 export const modifySelectOptionsArray = (
-    optionsArr: any,
+    optionsArr: any[],
     curLabelKey: string
 ) => {
     let newOptionsArr: IReactSelectOption[] = [];
@@ -52,6 +57,14 @@ export const getObjectFromLabel = (
     refArray: IReactSelectOption[]
 ) => {
     const targetObj = refArray.find((obj) => obj.label === searchLabel);
+    return targetObj ?? null;
+};
+
+export const getObjectFromValue = (
+    searchValue: string,
+    refArray: IReactSelectOption[]
+) => {
+    const targetObj = refArray.find((obj) => obj.value === searchValue);
     return targetObj ?? null;
 };
 
@@ -99,7 +112,7 @@ export const modifyFetchedEmployeeData = (employeeObj: IApiEmployee) => {
 export const getEmployeesListingData = (
     employeesList: IApiEmployee[],
     setIsModalOpen: (isOpen: boolean) => void,
-    setDeleteEmployee: (deleteEmployee: IDeleteEmployee) => void
+    setEmpIdToDelete: (empIdToDelete: number) => void
 ) => {
     const newEmpList: IEmployeeListing[] = [];
     for (const emp of employeesList) {
@@ -147,10 +160,7 @@ export const getEmployeesListingData = (
                             type="button"
                             className="delete-emp-btn flex-container"
                             onClick={() => {
-                                setDeleteEmployee({
-                                    isDeleting: false,
-                                    empIdToDelete: emp.id,
-                                });
+                                setEmpIdToDelete(emp.id);
                                 setIsModalOpen(true);
                             }}
                         >

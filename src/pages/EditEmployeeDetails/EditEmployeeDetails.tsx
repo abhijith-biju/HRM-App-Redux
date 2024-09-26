@@ -1,45 +1,59 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import useApi from '../../core/api/useApi';
+import { useAppSelector, useAppDispatch } from '../../hooks/storeHelpers';
 import { useEffect } from 'react';
 import StyledEditEmployeeDetails from './EditEmployeeDetails.style';
 import { EmployeeDetailsForm, Loader } from '../../components';
-import { toast } from 'react-toastify';
-import { IApiFetchEmployee } from '../../interfaces/ApiDataInterface';
-import { modifyFetchedEmployeeData } from '../../utils';
+import { fetchEmployee } from '../../core/store/employee/actions';
+import { selectEmployeeDetails } from '../../core/store/employee/reducer';
+import {
+    selectRequestError,
+    selectRequestInProgress,
+} from '../../core/store/requests/reducer';
+import { REQUESTS_ENUM } from '../../core/store/requests/requestsEnum';
+import { clearRequest } from '../../core/store/requests/actions';
 
 const EditEmployeeDetails: React.FC = () => {
-    const { employeeId } = useParams();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { employeeId } = useParams();
 
-    const { response, loading, error } = useApi<IApiFetchEmployee>(
-        'GET',
-        `/employee/${employeeId}`
+    if (!employeeId) {
+        navigate('/view-employee', { replace: true });
+        return;
+    }
+
+    const employeeDetails = useAppSelector(selectEmployeeDetails);
+    const employeeFetchLoading = useAppSelector(
+        selectRequestInProgress(REQUESTS_ENUM.getEmployee)
+    );
+    const employeeFetchError = useAppSelector(
+        selectRequestError(REQUESTS_ENUM.getEmployee)
     );
 
     useEffect(() => {
-        if (error) {
-            toast.error(`Could not fetch the requested employee's details`);
-            navigate('/', { replace: true });
-        }
+        dispatch(fetchEmployee(Number(employeeId)));
+    }, [employeeId]);
 
-        if (response && !response.data) {
-            toast.error('Could not find the requested employee.');
+    useEffect(() => {
+        if (employeeFetchError) {
+            dispatch(clearRequest('GET_EMPLOYEE'));
             navigate('/view-employee', { replace: true });
         }
-    }, [loading]);
+    }, [employeeFetchError]);
 
     return (
         <>
-            {loading && <Loader className="full-screen-loader" />}
-            {response?.data && (
-                <StyledEditEmployeeDetails>
-                    <h2 className="text-center">Edit Employee Details</h2>
+            {employeeFetchLoading ? (
+                <Loader className="full-screen-loader" />
+            ) : (
+                employeeDetails &&
+                employeeDetails.id === Number(employeeId) && (
+                    <StyledEditEmployeeDetails>
+                        <h2 className="text-center">Edit Employee Details</h2>
 
-                    <EmployeeDetailsForm
-                        empId={employeeId}
-                        prefillData={modifyFetchedEmployeeData(response.data)}
-                    />
-                </StyledEditEmployeeDetails>
+                        <EmployeeDetailsForm prefillData={employeeDetails} />
+                    </StyledEditEmployeeDetails>
+                )
             )}
         </>
     );
